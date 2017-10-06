@@ -19,7 +19,7 @@ class Posts extends Controller
      **/
     public function indexAction()
     {
-        View::render('Posts/index.php', [
+        View::renderTemplate('Posts/index.html', [
             'name' => 'Sonic the Hedgehog'
         ]);
     }
