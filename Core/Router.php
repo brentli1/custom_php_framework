@@ -1,5 +1,7 @@
 <?php
 
+namespace Core;
+
 /**
  * Router
  *
@@ -17,7 +19,7 @@ class Router
      * Parameters from the matched route
      * @var array
      */
-     protected $params = [];
+    protected $params = [];
 
     /**
      * Add a route to the routing table
@@ -79,6 +81,40 @@ class Router
     }
 
     /**
+     * Dispatch the route, create the controller object and run the action
+     *
+     * @param string $url The route URL
+     * @return void
+     **/
+    public function dispatch($url)
+    {
+        $url = $this->removeQueryString($url);
+        
+        if ($this->match($url)) {
+            $controller = $this->params['controller'];
+            $controller = $this->convertToStudlyCaps($controller);
+            $controller = $this->getNamespace() . $controller;
+
+            if (class_exists($controller)) {
+                $controller_object = new $controller($this->params);
+
+                $action = $this->params['action'];
+                $action = $this->convertToCamelCase($action);
+
+                if (preg_match('/action$/i', $action) == 0) {
+                    $controller_object->$action();
+                } else {
+                    echo 'Method $action in controller $controller cannot be called directly - remove the Action suffix to call this method.';
+                }
+            } else {
+                echo "Controller class $controller not found.";
+            }
+        } else {
+            echo 'No route matched.';
+        }
+    }
+
+    /**
      * Get the currently matched parameters
      *
      * @return array
@@ -86,5 +122,64 @@ class Router
     public function getParams()
     {
         return $this->params;
+    }
+
+    /**
+     * Convert string with hypens to StudlyCaps
+     *
+     * @param string $string The string to convert
+     * @return string
+     **/
+    public function convertToStudlyCaps($string)
+    {
+        return str_replace(' ', '', ucwords(str_replace('-', ' ', $string)));
+    }
+
+    /**
+     * Convert string with hyphens to calemCase
+     *
+     * @param string $string The string to convert
+     * @return string
+     **/
+    public function convertToCamelCase($string)
+    {
+        return lcfirst($this->convertToStudlyCaps($string));
+    }
+
+    /**
+     * Remove query string variables from url
+     *
+     * @param string $url The full URL
+     * @return string The URL with the query string removed
+     **/
+    public function removeQueryString($url)
+    {
+        if ($url != '') {
+            $parts = explode('&', $url, 2);
+
+            if (strpos($parts[0], '=') === false) {
+                $url = $parts[0];
+            } else {
+                $url = '';
+            }
+        }
+
+        return $url;
+    }
+
+    /**
+     * Get the namespace for the controller class.
+     *
+     * @return string The request namespace
+     **/
+    public function getNamespace()
+    {
+        $namespace = 'App\Controllers\\';
+
+        if (array_key_exists('namespace', $this->params)) {
+            $namespace .= $this->params['namespace'] . '\\';
+        }
+
+        return $namespace;
     }
 }
