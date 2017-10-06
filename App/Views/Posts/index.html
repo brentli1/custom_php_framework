@@ -1,12 +1,6 @@
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>codebrent - Custom MVC</title>
-</head>
-<body>
-    <h1>Welcome to the Post Index page.</h1>
-    <p>Your name is {{ name }}</p>
-</body>
-</html>
+{% extends 'layouts/base.html' %}
+
+{% block body %}
+<h1>Welcome to the Post Index page.</h1>
+<p>Your name is {{ name }}</p>
+{% endblock %}
