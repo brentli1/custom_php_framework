@@ -2,5 +2,12 @@
 
 {% block body %}
 <h1>Welcome to the Post Index page.</h1>
-<p>Your name is {{ name }}</p>
+<ul>
+    {% for post in posts %}
+        <li>
+            <h4>{{ post.title }}</h4>
+            <p>{{ post.body }}</p>
+        </li>
+    {% endfor %}
+</ul>
 {% endblock %}

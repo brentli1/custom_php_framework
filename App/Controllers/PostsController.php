@@ -4,13 +4,14 @@ namespace App\Controllers;
 
 use Core\Controller;
 use Core\View;
+use App\Models\Post;
 
 /**
  * Posts Controller
  *
  * PHP version 7.1.9
  */
-class Posts extends Controller
+class PostsController extends Controller
 {
     /**
      * Show the index page
@@ -19,8 +20,10 @@ class Posts extends Controller
      **/
     public function indexAction()
     {
+        $posts = Post::getAll();
+
         View::renderTemplate('Posts/index.html', [
-            'name' => 'Sonic the Hedgehog'
+            'posts' => $posts
         ]);
     }
 

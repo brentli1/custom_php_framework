@@ -1,5 +1,7 @@
 <?php
 
+// This is no longer being used in place of AltoRouter 
+
 namespace Core;
 
 /**
@@ -110,7 +112,8 @@ class Router
                 echo "Controller class $controller not found.";
             }
         } else {
-            echo 'No route matched.';
+            // echo 'No route matched.';
+            throw new \Exception('No route matched.', 404);
         }
     }
 

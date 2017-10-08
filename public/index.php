@@ -2,16 +2,28 @@
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 
-$router = new Core\Router();
+// Set error handler
+error_reporting(E_ALL);
+set_error_handler('Core\Error::errorHandler');
+set_exception_handler('Core\Error::exceptionHandler'); 
+
+$router = new AltoRouter();
 
 // Add routes here
-$router->add('', [
-    'controller' => 'Home',
-    'action' => 'index'
-]);
+$router->map('GET', '/posts', 'App\Controllers\PostsController#index');
 
-$router->add('{controller}/{action}');
-$router->add('{controller}/{id:\d+}/{action}');
-$router->add('admin/{controller}/{action}', ['namespace' => 'Admin']);
+$match = $router->match();
 
-$router->dispatch($_SERVER['QUERY_STRING']);
+if($match) {
+    $target = $match["target"];
+    if(strpos($target, "#") !== false) {
+        list($controller, $action) = explode("#", $target);
+        $controller = new $controller([]);
+        $controller->$action($match["params"]);
+    } else {
+        if(is_callable($match["target"])) call_user_func_array($match["target"], $match["params"]);
+        else require $match["target"];
+    }
+} else {
+    throw new \Exception('Route not found.', 404);
+}
